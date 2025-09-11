@@ -8,7 +8,7 @@ import { w as bw } from 'be-hive/w.js';
 /** @import {CSSQuery} from './ts-refs/trans-render/types.js' */
 
 const dependencyPart = String.raw `(?<dependencyPart>.*)`;
-const ofDependencies = String.raw `^(o|O)f ${dependencyPart}`;
+const dependencies = String.raw `^${dependencyPart}`;
 
 
 /**
@@ -27,7 +27,7 @@ export const emc = {
             regExpExts: {
                 parsedStatements: [
                     {
-                        regExp: ofDependencies,
+                        regExp: dependencies,
                         defaultVals:{},
                         dssArrayKeys
                     }
@@ -38,8 +38,8 @@ export const emc = {
     },
     enhPropKey: 'beObservant',
     importEnh: async () => {
-        const {BeObservant} = await import('./be-observant.js');
-        return BeObservant;
+        const {DataProps} = await import('./data-props.js');
+        return DataProps;
     },
     
 }

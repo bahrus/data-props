@@ -12,7 +12,7 @@ import {ASMRHandler} from './ASMRHandler.js';
  * @implements {Actions}
  * 
  */
-class BeObservant extends BE {
+class DataProps extends BE {
     /**
      * @type {BEConfig<AP & BEAllProps, Actions & IEnhancement, HTMLElement>}
      */
@@ -70,5 +70,5 @@ class BeObservant extends BE {
     }
 }
 
-await BeObservant.bootUp();
-export {BeObservant};
+await DataProps.bootUp();
+export {DataProps};
