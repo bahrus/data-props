@@ -1,7 +1,16 @@
 {
   "name": "data-props",
   "version": "0.0.0",
-  "description": "",
+  "keywords": [
+    "web-components",
+    "web-component",
+    "custom-element",
+    "custom-elements",
+    "JSON",
+    "bind",
+    "observe"
+  ],
+  "description": "Reflect host(ish) props to data-* attributes.",
   "homepage": "https://github.com/bahrus/data-props#readme",
   "bugs": {
     "url": "https://github.com/bahrus/data-props/issues"
@@ -14,7 +23,21 @@
   "author": "Bruce B. Anderson <anderson.bruce.b@gmail.com>",
   "type": "module",
   "main": "data-props.js",
+  "module": "data-props.js",
   "scripts": {
-    "test": "test playwright"
+    "serve": "python ./node_modules/ssi-server/ssi_server.py",
+    "test": "playwright test",
+    "safari": "npx playwright wk http://localhost:8000",
+    "update": "ncu -u && npm install"
+  },
+  "dependencies": {
+    "be-enhanced": "0.0.186",
+    "be-hive": "0.0.265",
+    "trans-render": "0.0.954"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.55.0",
+    "ssi-server": "0.0.1",
+    "xtal-element": "0.0.631"
   }
 }
