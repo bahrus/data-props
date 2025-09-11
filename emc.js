@@ -19,7 +19,7 @@ const dssArrayKeys = [['dependencyPart', 'remoteSpecifiers']];
  * @type {Partial<EMC<any, AP>>}
  */
 export const emc = {
-    base: 'be-observant',
+    base: 'data-props',
     map: {
         '0.0': {
             instanceOf: 'Object$entences',
@@ -36,7 +36,7 @@ export const emc = {
             }
         }
     },
-    enhPropKey: 'beObservant',
+    enhPropKey: 'dataProps',
     importEnh: async () => {
         const {DataProps} = await import('./data-props.js');
         return DataProps;
