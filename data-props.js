@@ -44,7 +44,10 @@ class DataProps extends BE {
             const {remoteSpecifiers} = statement;
             for(const remoteSpecifier of remoteSpecifiers){
                 const remoteEl = await find(enhancedElement, remoteSpecifier);
-                if(!(remoteEl instanceof EventTarget)) throw 404;
+                if(!(remoteEl instanceof EventTarget)){
+                    console.warn(404, enhancedElement, remoteSpecifier);
+                    continue;
+                };
                 const {prop} = remoteSpecifier;
                 let datasetName = prop;
                 if(prop === undefined){
