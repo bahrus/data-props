@@ -1,0 +1,31 @@
+{
+    "enhConfig": {
+        "enhKey": "DataProps",
+        "spawn": "data-props/data-props.js",
+        "withAttrs": {
+            "base": "data-props",
+            "_base": {
+                "mapsTo": "parsedStatements",
+                "parser": "parse-pattern-statements",
+                "instanceOf": "Array",
+                "parserConfig": [
+                    {
+                        "name": "idReference",
+                        "pattern": "^#(?<id>\\S+)",
+                        "description": "Element reference by ID: #elementId"
+                    }
+                ]
+            }
+        }
+    },
+    "customData": {
+        "weakRef": {
+            "properties": [
+                "enhancedElement"
+            ]
+        },
+        "compacts": {
+            "when_parsedStatements_changes_call_hydrate": 0
+        }
+    }
+}

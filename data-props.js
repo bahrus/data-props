@@ -1,71 +1,82 @@
 // @ts-check
-import { propInfo, rejected, resolved } from 'be-enhanced/cc.js';
-import { BE } from 'be-enhanced/BE.js';
-import {dispatchEvent as de} from 'trans-render/positractions/dispatchEvent.js';
-import { lispToCamel } from 'trans-render/lib/lispToCamel.js';
-import {ASMRHandler} from './ASMRHandler.js';
-
-/** @import {BEConfig, IEnhancement, BEAllProps} from './ts-refs/be-enhanced/types' */
-/** @import {Actions, PAP, AllProps, AP, BAP} from './ts-refs/be-observant/types' */;
+/** @import {Actions, PAP, AllProps, AP} from './types/data-props/types' */;
+/** @import {RoundaboutOptions} from './types/roundabout/types' */;
+/** @import {ElementEnhancementGateway, SpawnContext} from './types/assign-gingerly/types' */;
+/** @import {EMC} from './types/mount-observer/types' */;
+/** @import {RAConfig} from './types/roundabout/types' */;
+/** @import {Infer} from './types/inferencer/types' */;
 
 /**
  * @implements {Actions}
- * 
  */
-class DataProps extends BE {
+class DataProps {
+
     /**
-     * @type {BEConfig<AP & BEAllProps, Actions & IEnhancement, HTMLElement>}
+     * @this {AllProps & Actions}
+     * @param {Element & ElementEnhancementGateway} enhancedElement 
+     * @param {SpawnContext} ctx 
+     * @param {PAP} initVals 
      */
-    static config = {
-        propInfo:{
-            ...propInfo,
-            parsedStatements: {},
-            rawStatements: {},
-        },
-        positractions: [resolved, rejected],
-        compacts: {
-            when_parsedStatements_changes_call_hydrate: 0,
-        }
-    };
-
-    de = de;
+    constructor(enhancedElement, ctx, initVals){
+        this.init(this, enhancedElement, ctx, initVals);
+    }
 
     /**
-     * 
-     * @param {BAP} self 
-     * @returns 
+     * @param {AllProps} self 
+     * @param {Element & ElementEnhancementGateway} enhancedElement 
+     * @param {SpawnContext} ctx 
+     * @param {PAP} initVals 
+     */
+    async init(self, enhancedElement, ctx, initVals){
+        const {customData} = /** @type {EMC<any, AllProps, Element, RAConfig<AllProps, Actions>>} */ (ctx.emc);
+        /**
+         * @type {RoundaboutOptions}
+         */
+        const raOptions = {
+            ...customData,
+            vm: self,
+            initialPropVals: {
+                enhancedElement,
+                ...customData?.defaultPropVals,
+                ...initVals
+            }
+        };
+        (await import('roundabout-lib/roundabout.js')).roundabout(raOptions);
+    }
+
+    /**
+     * @param {AP} self 
+     * @returns {Promise<PAP>}
      */
     async hydrate(self){
         const {parsedStatements, enhancedElement} = self;
-        const {find} = await import('trans-render/dss/find.js');
-        const {ASMR} = await import('trans-render/asmr/asmr.js');
-        const {ASMRHandler} = await import('./ASMRHandler.js');
-        for(const statement of parsedStatements){
-            const {remoteSpecifiers} = statement;
+        const {success, statements} = parsedStatements;
+        if(!success) throw 400;
+        const {inferEventType, inferValueProperty} = await import('inferencer/inferencer.js');
+        for(const statement of statements){
+            const {value} = statement;
+            if(!value) continue;
+            const {remoteSpecifiers} = value;
+            if(!remoteSpecifiers) continue;
             for(const remoteSpecifier of remoteSpecifiers){
-                const remoteEl = await find(enhancedElement, remoteSpecifier);
-                if(!(remoteEl instanceof EventTarget)){
+                const {id} = remoteSpecifier;
+                if(!id) continue;
+                const rootNode = enhancedElement.getRootNode();
+                const remoteEl = /** @type {Document | ShadowRoot} */ (rootNode).getElementById(id);
+                if(!remoteEl){
                     console.warn(404, enhancedElement, remoteSpecifier);
                     continue;
-                };
-                const {prop} = remoteSpecifier;
-                let datasetName = prop;
-                if(prop === undefined){
-                    if(!(remoteEl instanceof HTMLElement)) throw 'NI';
-                    const remoteIDSrcName = remoteEl.dataset.id || remoteEl.id;
-                    if(!remoteIDSrcName) throw 'NI';
-                    datasetName = lispToCamel(remoteIDSrcName);
                 }
-                if(datasetName === undefined) throw 500;
-                const {path, as, evtName} = remoteSpecifier;
-                const ao = await ASMR.getAO(remoteEl, {
-                    evt: evtName || 'input',
-                    propToAbsorb: path !== undefined ? `?.${prop}?.${path}` : prop,
-                    as
+                const datasetName = lispToCamel(id);
+                const evtType = inferEventType(remoteEl);
+                const propName = inferValueProperty(remoteEl);
+                // Set initial value
+                setDataAttr(enhancedElement, datasetName, remoteEl[propName]);
+                // Listen for changes
+                remoteEl.addEventListener(evtType, () => {
+                    setDataAttr(enhancedElement, datasetName, remoteEl[propName]);
                 });
-                new ASMRHandler(self, ao, datasetName);
             }
-
         }
         return /** @type {PAP} */({
             resolved: true,
@@ -73,5 +84,26 @@ class DataProps extends BE {
     }
 }
 
-await DataProps.bootUp();
+/**
+ * @param {Element} el 
+ * @param {string} name 
+ * @param {any} val 
+ */
+function setDataAttr(el, name, val){
+    if(val === undefined || val === null){
+        delete /** @type {HTMLElement} */ (el).dataset[name];
+    } else {
+        /** @type {HTMLElement} */ (el).dataset[name] = val.toString();
+    }
+}
+
+/**
+ * Converts lisp-case string to camelCase
+ * @param {string} s 
+ * @returns {string}
+ */
+function lispToCamel(s){
+    return s.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+}
+
 export {DataProps};
